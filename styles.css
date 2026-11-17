@@ -209,3 +209,15 @@ footer p{margin:0;max-width:44rem}
   .res-sec li{margin:1px 0}
   a{color:#000;text-decoration:none}
 }
+
+/* Report figures (added 17 Nov 2026) */
+.fig{margin:22px 0 0;background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px}
+.fig img{display:block;width:100%;height:auto}
+.fig figcaption{font-size:.8rem;color:var(--muted);margin-top:8px}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+.feature .fig{margin:0}
+@media (max-width:760px){.feature{grid-template-columns:1fr}}
+.tag.ow{background:#e8f3ec;border-color:#9ccbac;color:#1f6b3a}
+.tag.n{background:#eef1f5;border-color:#c6cdda;color:#3d4a5c}
+.feature>*{min-width:0}
+@media (max-width:760px){.feature .rbox{grid-template-columns:1fr 1fr 1fr!important}.feature .rbox .v{font-size:1.15rem}}
