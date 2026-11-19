@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports | Hammaad Mondal</title>
+<meta name="description" content="All equity research reports by Hammaad Mondal: initiations, IPO views and notes, newest first.">
+<meta name="theme-color" content="#15171b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315171b'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%238fc4b2'/%3E%3Crect x='13' y='14' width='5' height='12' fill='%238fc4b2'/%3E%3Crect x='20' y='7' width='5' height='19' fill='%238fc4b2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="masthead">
+<div class="wrap">
+<a class="brand" href="/"><span class="mark">HM</span>Hammaad Mondal<small>Equity Research</small></a>
+<nav class="nav" aria-label="Main">
+<a href="/">Home</a>
+<a href="/reports/" aria-current="page">Reports</a>
+<a href="/about/">About</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</nav>
+</div>
+</header>
+
+<main>
+<section class="band"><div class="wrap hero compact">
+<p class="kicker">Research</p>
+<h1>Reports</h1>
+<p class="lede">Every initiation, IPO view and note, with its date, view and key numbers. Downloads sit beside each report.</p>
+</div></section>
+
+<div class="wrap shop">
+<aside class="filters" aria-label="Filter reports">
+<h2>Filter</h2>
+<fieldset><legend>Type</legend><div id="f-type"></div></fieldset>
+<fieldset><legend>Sector</legend><div id="f-sector"></div></fieldset>
+<button type="button" class="clear" id="clear">Clear filters</button>
+</aside>
+
+<section class="results" aria-live="polite">
+<div class="toolbar">
+<p id="count">&nbsp;</p>
+<label>Sort by <select id="sort"><option value="new">Newest first</option><option value="old">Oldest first</option></select></label>
+</div>
+<ol class="listing" id="listing"></ol>
+<noscript><p>This list needs JavaScript. Reports: <a href="/reports/anthropic/">Anthropic</a>, <a href="/reports/ryanair/">Ryanair</a>, <a href="/reports/aib/">AIB Group</a>.</p></noscript>
+</section>
+</div>
+</main>
+
+<footer>
+<div class="wrap">
+<div class="foot-top">
+<div>
+<div class="foot-name">Hammaad Mondal</div>
+<p style="margin-top:6px">MSc Finance, UCD Michael Smurfit Graduate Business School &middot; Dublin</p>
+</div>
+<div class="foot-links">
+<a href="mailto:hammaadmondal@gmail.com">hammaadmondal@gmail.com</a>
+<a href="https://www.linkedin.com/in/hammaadmondal">LinkedIn</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</div>
+</div>
+<div class="foot-bottom">
+<p>Student work, not investment advice. Ratings, price targets and views are illustrative and date-stamped. See <a href="/disclosures/">Disclosures</a>.</p>
+<p>&copy; 2026 Hammaad Mondal</p>
+</div>
+</div>
+</footer>
+<script src="/reports/data.js"></script>
+<script>
+{
+const state={type:new Set(),sector:new Set(),sort:'new'};
+const uniq=k=>[...new Set(REPORTS.map(r=>r[k]))].sort();
+const box=(k,v)=>{const n=REPORTS.filter(r=>r[k]===v).length,id=`f-${k}-${v.replace(/\W+/g,'-')}`;return `<label class="chk" for="${id}"><input type="checkbox" id="${id}" data-k="${k}" value="${v}"> ${v} <span>(${n})</span></label>`};
+document.getElementById('f-type').innerHTML=uniq('type').map(v=>box('type',v)).join('');
+document.getElementById('f-sector').innerHTML=uniq('sector').map(v=>box('sector',v)).join('');
+const list=document.getElementById('listing'),count=document.getElementById('count');
+function render(){
+  const rows=sortedReports(state.sort==='old').filter(r=>(!state.type.size||state.type.has(r.type))&&(!state.sector.size||state.sector.has(r.sector)));
+  count.textContent=`${rows.length} of ${REPORTS.length} report${REPORTS.length===1?'':'s'}`;
+  list.innerHTML=rows.length?rows.map(r=>`<li class="item">
+<a class="thumb" href="${r.url}"><img src="${r.img}" alt="${r.imgAlt}" loading="lazy"></a>
+<div class="info">
+<p class="badges"><span class="tag ${r.type==='Initiation'?'ow':'n'}">${r.type}</span><time datetime="${r.date}">${fmtDate(r.date)}</time></p>
+<h2><a href="${r.url}">${r.title}</a></h2>
+<p class="co-line">${r.company} &middot; ${r.ticker} &middot; ${r.exchange} &middot; ${r.sector}</p>
+<p class="summary">${r.summary}</p>
+<div class="btns"><a class="btn primary" href="${r.url}">Read the report</a>${r.pdf?`<a class="btn" href="${r.pdf}">PDF</a>`:''}${r.model?`<a class="btn" href="${r.model}">Excel model</a>`:''}</div>
+</div>
+<div class="buybox">
+<div class="l">${r.type==='Initiation'?'Rating':'My view'}</div>
+<div class="view">${r.view}</div>
+<dl>${r.stats.map(s=>`<div><dt>${s[0]}</dt><dd class="${s[2]?'up':''}">${s[1]}</dd></div>`).join('')}</dl>
+</div>
+</li>`).join(''):'<li class="empty">No reports match these filters.</li>';
+}
+document.querySelector('.filters').addEventListener('change',e=>{const i=e.target;if(!i.dataset.k)return;i.checked?state[i.dataset.k].add(i.value):state[i.dataset.k].delete(i.value);render()});
+document.getElementById('sort').addEventListener('change',e=>{state.sort=e.target.value;render()});
+document.getElementById('clear').addEventListener('click',()=>{state.type.clear();state.sector.clear();document.querySelectorAll('.filters input').forEach(i=>i.checked=false);render()});
+render();
+}
+</script>
+</body>
+</html>
