@@ -5,13 +5,13 @@
 window.REPORTS = [
   {
     url: "/reports/anthropic/",
-    title: "A great business at a full price",
+    title: "A great business, now close to a fair price",
     company: "Anthropic, PBC", ticker: "ANT", exchange: "Nasdaq", sector: "AI software",
-    type: "IPO view", date: "2026-11-19",
+    type: "IPO view", date: "2026-11-23",
     img: "/reports/img/ant_day.png", imgAlt: "ANT first-day trade prices against the $83 IPO price",
-    summary: "What the S-1 filings show, how the shares traded on day one, and why $97 already needs about $300bn of revenue by 2030.",
+    summary: "What the S-1 filings show, how the shares traded in the first week, and why $88.91 needs about $270bn of revenue by 2030. Updated 23 Nov; first published 19 Nov.",
     view: "Neutral",
-    stats: [["IPO price", "$83.00"], ["Day-one close", "$97.17"], ["vs IPO", "+17.1%", "up"]],
+    stats: [["IPO price", "$83.00"], ["Last close", "$88.91"], ["vs IPO", "+7.1%", "up"]],
     pdf: null, model: null
   },
   {
