@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reverse DCF: what is the market pricing in? | Hammaad Mondal</title>
+<meta name="description" content="A reverse discounted cash flow calculator: enter a share price and see the revenue growth or cash margin the market is implying.">
+<meta name="theme-color" content="#15171b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315171b'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%238fc4b2'/%3E%3Crect x='13' y='14' width='5' height='12' fill='%238fc4b2'/%3E%3Crect x='20' y='7' width='5' height='19' fill='%238fc4b2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+</head>
+<body>
+<header class="masthead">
+<div class="wrap">
+<a class="brand" href="/"><span class="mark">HM</span>Hammaad Mondal<small>Equity Research</small></a>
+<nav class="nav" aria-label="Main">
+<a href="/">Home</a>
+<a href="/reports/">Reports</a>
+<a href="/tools/" aria-current="page">Tools</a>
+<a href="/about/">About</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</nav>
+</div>
+</header>
+
+<main>
+<section class="band">
+<div class="wrap hero compact">
+<p class="kicker"><a href="/tools/" style="color:inherit;text-decoration:none">Tools</a> &middot; Valuation</p>
+<h1>Reverse DCF</h1>
+<p class="lede">A normal DCF asks what a company is worth. A reverse DCF starts from the share price and asks what you have to believe to pay it. Enter the price and a few numbers from the accounts, and the tool solves for the revenue growth, or the cash margin, the market is implying.</p>
+</div>
+</section>
+
+<section class="wrap section" style="padding-top:44px">
+<div class="tool-layout">
+
+<form class="panel inputs" id="f" autocomplete="off" onsubmit="return false">
+<h3>Start from</h3>
+<div class="field"><label for="preset">Example</label>
+<select id="preset">
+<option value="rya">Ryanair</option>
+<option value="blank">My own numbers</option>
+</select></div>
+<p class="hint" id="presetNote"></p>
+
+<h3>Market</h3>
+<div class="field"><label for="cur">Currency</label><select id="cur"><option>€</option><option>$</option><option>£</option></select></div>
+<div class="field"><label for="price">Share price</label><input id="price" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label for="shares">Shares outstanding<small>millions</small></label><input id="shares" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label for="netdebt">Net debt<small>millions; negative = net cash</small></label><input id="netdebt" type="number" step="any" inputmode="decimal"></div>
+
+<h3>Business</h3>
+<div class="field"><label for="rev0">Revenue, last full year<small>millions</small></label><input id="rev0" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label for="years">Forecast years</label><select id="years"><option>5</option><option>7</option><option selected>10</option><option>15</option></select></div>
+
+<h3>Solve for</h3>
+<div class="seg" role="group" aria-label="Solve for">
+<button type="button" data-solve="g" aria-pressed="true">Revenue growth</button>
+<button type="button" data-solve="m" aria-pressed="false">FCF margin</button>
+</div>
+<div class="field" id="fg"><label for="g">Revenue growth a year<small>%</small></label><input id="g" type="number" step="0.1" inputmode="decimal"></div>
+<div class="field" id="fm"><label for="m">Free cash flow margin<small>% of revenue</small></label><input id="m" type="number" step="0.1" inputmode="decimal"></div>
+<p class="hint">The greyed field is the answer. Free cash flow here means operating cash flow less capital expenditure.</p>
+
+<h3>Discounting</h3>
+<div class="field"><label for="wacc">WACC<small>%</small></label><input id="wacc" type="number" step="0.05" inputmode="decimal"></div>
+<div class="field"><label for="tg">Terminal growth<small>% a year after the forecast</small></label><input id="tg" type="number" step="0.05" inputmode="decimal"></div>
+
+<h3>Your view (optional)</h3>
+<div class="field"><label for="vg">Your revenue growth<small>%</small></label><input id="vg" type="number" step="0.1" inputmode="decimal"></div>
+<div class="field"><label for="vm">Your FCF margin<small>%</small></label><input id="vm" type="number" step="0.1" inputmode="decimal"></div>
+<div class="btns" style="margin-top:16px"><button type="button" class="btn" id="share">Copy link to these inputs</button></div>
+</form>
+
+<div>
+<div class="answer" aria-live="polite">
+<div class="l" id="ansLabel">Implied revenue growth</div>
+<div class="big" id="ans">&ndash;</div>
+<p id="ansText"></p>
+</div>
+
+<div class="kpis">
+<div><div class="l">Market cap</div><div class="v" id="kMcap">&ndash;</div><div class="s">price &times; shares</div></div>
+<div><div class="l">Enterprise value</div><div class="v" id="kEv">&ndash;</div><div class="s">market cap + net debt</div></div>
+<div><div class="l" id="kRevL">Revenue, year 10</div><div class="v" id="kRevN">&ndash;</div><div class="s" id="kRevS">implied</div></div>
+<div><div class="l">Your view: value</div><div class="v" id="kVal">&ndash;</div><div class="s" id="kUp">per share</div></div>
+</div>
+
+<div class="block">
+<h2>Where the value comes from</h2>
+<div class="stack-bar" id="stack"><div class="a" id="stA"></div><div class="b" id="stB"></div></div>
+<p class="hint" id="stackNote"></p>
+</div>
+
+<div class="block">
+<div class="chart" id="pathChart">
+<div class="chart-head"><h3>Revenue path: market-implied vs your view</h3>
+<div class="key"><span><i style="background:#1e5c4e"></i>Market-implied</span><span style="color:#15171b"><i class="dash" style="background:#15171b"></i>Your view</span></div></div>
+<p class="src" id="pathSrc"></p>
+</div>
+</div>
+
+<div class="block">
+<h2 id="sensTitle">Sensitivity: implied growth</h2>
+<div class="table-wrap"><table class="sens" id="sens"></table></div>
+<p class="hint" id="sensNote"></p>
+</div>
+
+<div class="block">
+<h2>How it works</h2>
+<div class="formula">
+<p>The tool runs a simple DCF and searches for the input that makes the DCF value equal to today's enterprise value.</p>
+<ul>
+<li><b>Enterprise value today.</b> Market cap plus net debt: what you pay for the whole business, debt included.</li>
+<li><b>Cash flow each year.</b> Last year's revenue, grown at the growth rate for that many years, times the cash margin.</li>
+</ul>
+$$FCF_t = R_0\,(1+g)^t \times m$$
+<ul>
+<li><b>Value of the business.</b> Each year's cash flow divided by one plus the discount rate raised to that year, added up, plus a terminal value discounted the same way.</li>
+</ul>
+$$EV = \sum_{t=1}^{N} \frac{FCF_t}{(1+WACC)^t} + \frac{TV_N}{(1+WACC)^N}$$
+<ul>
+<li><b>Terminal value.</b> Next year's cash flow divided by the gap between the discount rate and the long-run growth rate.</li>
+</ul>
+$$TV_N = \frac{FCF_N\,(1+g_{T})}{WACC - g_{T}}$$
+<ul>
+<li><b>The reverse step.</b> Solving for growth: the tool tries growth rates (bisection) until the DCF value equals market EV to within 0.0001%. Solving for margin is direct, because value rises one-for-one with the margin.</li>
+</ul>
+$$m^{*} = \frac{EV_{market}}{EV\ \text{at}\ m = 100\%}$$
+<ul>
+<li><b>Simplifications.</b> Growth and margin are held flat for the forecast; cash flows arrive at year end; there is no stub period. My full models use year-by-year forecasts, so their answers will differ. Use this for a quick read on expectations, not as a price target.</li>
+</ul>
+</div>
+</div>
+
+<p class="disclaimer">Student work, not investment advice. The Ryanair example uses public inputs from my <a href="/reports/ryanair/">17 Nov 2026 initiation</a>: price &euro;25.24 (Euronext Dublin close, 17 Nov 2026), 1,037.6m shares (AGM notice 2026), net cash &euro;2,009m (H1 FY27 6-K, 30 Sep 2026), FY26 revenue &euro;15,544m (FY26 results), FCF margin 12.5% (average of FY25&ndash;FY26 operating cash flow less capex over revenue), WACC 8.84% and terminal growth 2.5% (my model). See <a href="/disclosures/">Disclosures</a>.</p>
+</div>
+
+</div>
+</section>
+</main>
+
+<footer>
+<div class="wrap">
+<div class="foot-top">
+<div>
+<div class="foot-name">Hammaad Mondal</div>
+<p style="margin-top:6px">MSc Finance, UCD Michael Smurfit Graduate Business School &middot; Dublin</p>
+</div>
+<div class="foot-links">
+<a href="mailto:hammaadmondal@gmail.com">hammaadmondal@gmail.com</a>
+<a href="https://www.linkedin.com/in/hammaadmondal">LinkedIn</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</div>
+</div>
+<div class="foot-bottom">
+<p>Student work, not investment advice. Ratings and price targets are illustrative and date-stamped. See <a href="/disclosures/">Disclosures</a>.</p>
+<p>&copy; 2026 Hammaad Mondal</p>
+</div>
+</div>
+</footer>
+
+<script src="/tools/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.querySelector('.formula'),{delimiters:[{left:'$$',right:'$$',display:true}]})"></script>
+<script>
+(function () {
+  var PRESETS = {
+    rya: { cur: "€", price: 25.24, shares: 1037.578, netdebt: -2009.1, rev0: 15544, years: 10, g: 5, m: 12.5, wacc: 8.84, tg: 2.5, vg: 5, vm: 12.5,
+           note: "Inputs from my Ryanair initiation (17 Nov 2026). Your view is set to 5% growth, close to Ryanair's traffic target plus modest fare growth." },
+    blank: { cur: "€", price: 10, shares: 100, netdebt: 0, rev0: 500, years: 10, g: 5, m: 10, wacc: 9, tg: 2, vg: 6, vm: 10,
+             note: "Placeholder numbers. Replace them with the company's own figures." }
+  };
+  var ids = ["cur","price","shares","netdebt","rev0","years","g","m","wacc","tg","vg","vm"];
+  var $ = function (id) { return document.getElementById(id); };
+  var solve = "g";
+
+  function load(p) { ids.forEach(function (k) { $(k).value = p[k]; }); $("presetNote").textContent = p.note || ""; }
+  function read() { var o = {}; ids.forEach(function (k) { o[k] = k === "cur" ? $(k).value : parseFloat($(k).value); }); return o; }
+
+  function dcf(rev0, g, m, W, gT, N) {
+    var pv = 0, f = 0, rev = rev0, path = [[0, rev0]];
+    for (var t = 1; t <= N; t++) { rev = rev * (1 + g); f = rev * m; pv += f / Math.pow(1 + W, t); path.push([t, rev]); }
+    var tv = f * (1 + gT) / (W - gT), pvtv = tv / Math.pow(1 + W, N);
+    return { pv: pv, pvtv: pvtv, ev: pv + pvtv, revN: rev, fN: f, path: path };
+  }
+  function solveG(target, rev0, m, W, gT, N) {
+    var lo = -0.5, hi = 1.0;
+    if (dcf(rev0, lo, m, W, gT, N).ev > target || dcf(rev0, hi, m, W, gT, N).ev < target) return null;
+    for (var i = 0; i < 200; i++) { var mid = (lo + hi) / 2; if (dcf(rev0, mid, m, W, gT, N).ev < target) lo = mid; else hi = mid; }
+    return (lo + hi) / 2;
+  }
+  function solveM(target, rev0, g, W, gT, N) { return target / dcf(rev0, g, 1, W, gT, N).ev; }
+
+  var nf = function (v, d) { return v.toLocaleString("en-IE", { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var pc = function (v, d) { d = d == null ? 1 : d; var s = nf(Math.abs(v * 100), d); return (v < 0 && +s.replace(/,/g, "") !== 0 ? "\u2212" : "") + s + "%"; };
+  function money(v, c) { var a = Math.abs(v), s = v < 0 ? "−" : ""; return a >= 1000 ? s + c + nf(a / 1000, 1) + "bn" : s + c + nf(a, 0) + "m"; }
+
+  function run() {
+    var x = read(), c = x.cur, N = x.years | 0, W = x.wacc / 100, gT = x.tg / 100;
+    var mcap = x.price * x.shares, target = mcap + x.netdebt;
+    $("kMcap").textContent = isFinite(mcap) ? money(mcap, c) : "–";
+    $("kEv").textContent = isFinite(target) ? money(target, c) : "–";
+    $("kRevL").textContent = "Revenue, year " + N;
+    var err = null;
+    if (![x.price, x.shares, x.netdebt, x.rev0, W, gT].every(isFinite)) err = "Fill in every field to see a result.";
+    else if (W <= gT) err = "WACC must be above terminal growth, otherwise the terminal value is infinite.";
+    else if (target <= 0) err = "Net cash exceeds the market cap, so the market values the operating business at zero or less. A DCF cannot solve that.";
+    else if (x.rev0 <= 0) err = "Revenue must be positive.";
+    var g, m, r;
+    if (!err) {
+      if (solve === "g") {
+        m = x.m / 100;
+        if (!(m > 0)) err = "The FCF margin must be above zero to solve for growth.";
+        else { g = solveG(target, x.rev0, m, W, gT, N); if (g == null) err = "No growth rate between −50% and +100% a year gets there. Check the margin and the inputs."; }
+      } else {
+        g = x.g / 100;
+        if (!isFinite(g) || g <= -1) err = "Enter a growth rate.";
+        else m = solveM(target, x.rev0, g, W, gT, N);
+      }
+    }
+    var ans = $("ans"), at = $("ansText");
+    if (err) { ans.textContent = "–"; at.innerHTML = '<span class="warn">' + err + "</span>"; return; }
+    r = dcf(x.rev0, g, m, W, gT, N);
+    (solve === "g" ? $("g") : $("m")).value = +(solve === "g" ? g * 100 : m * 100).toFixed(2);
+    $("ansLabel").textContent = solve === "g" ? "Implied revenue growth, a year for " + N + " years" : "Implied free cash flow margin";
+    ans.textContent = solve === "g" ? (g >= 0 ? "+" : "") + pc(g, 1) : pc(m, 1);
+    at.textContent = solve === "g"
+      ? "At " + c + nf(x.price, 2) + ", and assuming a " + pc(m, 1) + " cash margin, the market is pricing revenue to " + (g >= 0 ? "grow " + pc(g, 1) : "shrink " + pc(-g, 1)) + " a year for " + N + " years, then " + pc(gT, 1) + " for ever after."
+      : "At " + c + nf(x.price, 2) + ", and assuming revenue " + (g >= 0 ? "grows " + pc(g, 1) : "shrinks " + pc(-g, 1)) + " a year, the market is pricing a free cash flow margin of " + pc(m, 1) + " of revenue.";
+    $("kRevN").textContent = money(r.revN, c);
+    $("kRevS").textContent = "implied; " + (r.revN / x.rev0).toFixed(2) + "x today";
+    var tvShare = r.pvtv / r.ev;
+    $("stA").style.flexBasis = (1 - tvShare) * 100 + "%"; $("stB").style.flexBasis = tvShare * 100 + "%";
+    $("stA").textContent = "Years 1–" + N + ": " + pc(1 - tvShare, 0);
+    $("stB").textContent = "Terminal value: " + pc(tvShare, 0);
+    $("stackNote").textContent = tvShare > 0.75 ? "Most of the price rests on what happens after year " + N + ". Small changes to WACC or terminal growth will move the answer a lot." : "Share of today's enterprise value from the forecast years versus the terminal value.";
+    // your view
+    var vg = x.vg / 100, vm = x.vm / 100, view = null;
+    if (isFinite(vg) && isFinite(vm) && vm > 0) {
+      view = dcf(x.rev0, vg, vm, W, gT, N);
+      var vps = (view.ev - x.netdebt) / x.shares, up = vps / x.price - 1;
+      $("kVal").textContent = c + nf(vps, 2);
+      $("kVal").className = "v " + (up >= 0 ? "up" : "down");
+      $("kUp").textContent = (up >= 0 ? "+" : "") + pc(up, 1) + " vs price";
+    } else { $("kVal").textContent = "–"; $("kVal").className = "v"; $("kUp").textContent = "per share"; }
+    // chart
+    var ser = [{ name: "Market-implied", color: "#1e5c4e", points: r.path, dots: true }];
+    if (view) ser.push({ name: "Your view", color: "#15171b", dash: true, points: view.path });
+    lineChart($("pathChart"), {
+      series: ser, xType: "num", xTicks: r.path.map(function (p) { return p[0]; }),
+      xLabel: function (t) { return t === 0 ? "Now" : "Y" + t; },
+      tipX: function (t) { return t === 0 ? "Last full year" : "Year " + t; },
+      yFmt: function (v) { return money(v, c); }, yUnit: "", yTick: function (v) { return Math.abs(v) >= 1000 ? c + nf(v / 1000, 0) + "bn" : c + nf(v, 0) + "m"; },
+      height: 280, label: "Implied revenue path"
+    });
+    $("pathSrc").textContent = "Revenue in " + c + " millions. Source: tool calculation from the inputs on this page.";
+    // sensitivity
+    var Ws = [-1, -0.5, 0, 0.5, 1].map(function (d) { return W + d / 100; });
+    var cols, head, cell, fmtc;
+    if (solve === "g") {
+      cols = [-4, -2, 0, 2, 4].map(function (d) { return m + d / 100; }).filter(function (v) { return v > 0; });
+      head = "WACC \\ FCF margin"; cell = function (w, cm) { return w > gT ? solveG(target, x.rev0, cm, w, gT, N) : null; };
+      $("sensTitle").textContent = "Sensitivity: implied revenue growth";
+      $("sensNote").textContent = "Each cell is the growth a year the market implies for that WACC (down) and FCF margin (across). Highlighted = current inputs. Blank = outside −50% to +100%.";
+    } else {
+      cols = [-4, -2, 0, 2, 4].map(function (d) { return g + d / 100; });
+      head = "WACC \\ revenue growth"; cell = function (w, cg) { return w > gT ? solveM(target, x.rev0, cg, w, gT, N) : null; };
+      $("sensTitle").textContent = "Sensitivity: implied FCF margin";
+      $("sensNote").textContent = "Each cell is the FCF margin the market implies for that WACC (down) and revenue growth (across). Highlighted = current inputs.";
+    }
+    var h = "<thead><tr><th>" + head + "</th>" + cols.map(function (v) { return '<th class="num">' + pc(v, 1) + "</th>"; }).join("") + "</tr></thead><tbody>";
+    Ws.forEach(function (w, i) {
+      h += "<tr><td><b>" + pc(w, 2) + "</b></td>" + cols.map(function (cv, j) {
+        var v = cell(w, cv), hl = i === 2 && Math.abs(cv - (solve === "g" ? m : g)) < 1e-9;
+        return '<td class="num' + (hl ? " hl" : "") + (v != null && v < 0 ? " neg" : "") + '">' + (v == null ? "" : pc(v, 1)) + "</td>";
+      }).join("") + "</tr>";
+    });
+    $("sens").innerHTML = h + "</tbody>";
+  }
+
+  function setSolve(s) {
+    solve = s;
+    document.querySelectorAll(".seg button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.solve === s); });
+    $("fg").classList.toggle("solved", s === "g"); $("fm").classList.toggle("solved", s === "m");
+    $("g").readOnly = s === "g"; $("m").readOnly = s === "m";
+    run();
+  }
+  document.querySelectorAll(".seg button").forEach(function (b) { b.addEventListener("click", function () { setSolve(b.dataset.solve); }); });
+  $("preset").addEventListener("change", function () { load(PRESETS[this.value]); run(); });
+  ids.forEach(function (k) { $(k).addEventListener("input", run); });
+  $("share").addEventListener("click", function () {
+    var x = read(), q = new URLSearchParams();
+    ids.forEach(function (k) { q.set(k, x[k]); }); q.set("solve", solve);
+    var url = location.origin + location.pathname + "#" + q.toString();
+    history.replaceState(null, "", url);
+    var b = this; (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { b.textContent = "Link copied"; }, function () { b.textContent = "Link is in the address bar"; });
+    setTimeout(function () { b.textContent = "Copy link to these inputs"; }, 2200);
+  });
+
+  // initial state: from link if present, else Ryanair
+  load(PRESETS.rya);
+  if (location.hash.length > 1) {
+    var q = new URLSearchParams(location.hash.slice(1));
+    ids.forEach(function (k) { if (q.has(k)) $(k).value = q.get(k); });
+    $("preset").value = "blank"; $("presetNote").textContent = "Loaded from a shared link.";
+    setSolve(q.get("solve") === "m" ? "m" : "g");
+  } else setSolve("g");
+})();
+</script>
+</body>
+</html>

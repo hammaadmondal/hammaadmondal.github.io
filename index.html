@@ -16,6 +16,7 @@
 <nav class="nav" aria-label="Main">
 <a href="/" aria-current="page">Home</a>
 <a href="/reports/">Reports</a>
+<a href="/tools/">Tools</a>
 <a href="/about/">About</a>
 <a href="/resume/">Resume</a>
 <a href="/disclosures/">Disclosures</a>
@@ -58,6 +59,14 @@
 </section>
 
 <section class="section wrap">
+<div class="section-head"><div><p class="kicker">Tools</p><h2>Built to use</h2></div><a href="/tools/">All tools</a></div>
+<div class="tool-grid">
+<article class="tool-card"><p class="kicker">Valuation</p><h3><a href="/tools/reverse-dcf/">Reverse DCF</a></h3><p>Enter a share price and see the growth or cash margin the market is pricing in.</p><div class="btns"><a class="btn primary" href="/tools/reverse-dcf/">Open</a></div></article>
+<article class="tool-card"><p class="kicker">Macro</p><h3><a href="/tools/macro/">Macro dashboard</a></h3><p>Euro area, Irish and US rates, inflation and yield curves, refreshed every weekday.</p><div class="btns"><a class="btn primary" href="/tools/macro/">Open</a></div></article>
+</div>
+</section>
+
+<section class="section wrap">
 <div class="section-head"><div><p class="kicker">Method</p><h2>How the research is built</h2></div></div>
 <div class="grid3">
 <div class="card"><div class="n">01</div><h3>Sourced</h3><p>Figures come from filings, company releases and public market data. Every table and chart names its source and date.</p></div>
@@ -97,7 +106,7 @@ el.innerHTML=sortedReports().map(r=>`<article class="report slide">
 <p class="kicker">${r.type} &middot; ${fmtDate(r.date)}</p>
 <h3><a href="${r.url}">${r.title}</a></h3>
 <p class="co-line">${r.company} &middot; ${r.ticker} &middot; ${r.sector}</p>
-<div class="stats"><div><div class="l">${r.type==='Initiation'?'Rating':'My view'}</div><div class="v">${r.view}</div></div>${r.stats.slice(0,2).map(s=>`<div><div class="l">${s[0]}</div><div class="v${s[2]?' up':''}">${s[1]}</div></div>`).join('')}</div>
+<div class="stats"><div><div class="l">${r.type==='Initiation'?'Rating':'My view'}</div><div class="v">${r.view}</div></div>${r.stats.slice(0,2).map(s=>`<div><div class="l">${s[0].replace(/^12m target$/i,'Target')}</div><div class="v${s[2]?' up':''}">${s[1]}</div></div>`).join('')}</div>
 <div class="btns"><a class="btn primary" href="${r.url}">Read</a>${r.pdf?`<a class="btn" href="${r.pdf}">PDF</a>`:''}${r.model?`<a class="btn" href="${r.model}">Model</a>`:''}</div>
 </div>
 </article>`).join('');

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Macro dashboard: rates, inflation and yields | Hammaad Mondal</title>
+<meta name="description" content="Euro area, Irish and US interest rates, inflation, yield curves and the euro, refreshed every weekday from ECB and FRED public data.">
+<meta name="theme-color" content="#15171b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315171b'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%238fc4b2'/%3E%3Crect x='13' y='14' width='5' height='12' fill='%238fc4b2'/%3E%3Crect x='20' y='7' width='5' height='19' fill='%238fc4b2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="masthead">
+<div class="wrap">
+<a class="brand" href="/"><span class="mark">HM</span>Hammaad Mondal<small>Equity Research</small></a>
+<nav class="nav" aria-label="Main">
+<a href="/">Home</a>
+<a href="/reports/">Reports</a>
+<a href="/tools/" aria-current="page">Tools</a>
+<a href="/about/">About</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</nav>
+</div>
+</header>
+
+<main>
+<section class="band">
+<div class="wrap hero compact">
+<p class="kicker"><a href="/tools/" style="color:inherit;text-decoration:none">Tools</a> &middot; Macro</p>
+<h1>Macro dashboard</h1>
+<p class="lede">The rates, inflation and yields that sit underneath every valuation I publish: the risk-free rate in a WACC, the funding cost of a bank, the currency a company earns in. Euro area and Ireland first, the US for comparison. Refreshed automatically every weekday from public ECB and Federal Reserve data.</p>
+<p class="status" id="status" style="margin-top:18px;color:var(--on-dark-2)">Loading data&hellip;</p>
+</div>
+</section>
+
+<section class="wrap section" style="padding-top:44px">
+<div class="section-head"><div><p class="kicker">Latest</p><h2>Key readings</h2></div><p>Change is against the reading closest to one year earlier.</p></div>
+<div class="tiles" id="tiles"></div>
+</section>
+
+<section class="wrap section">
+<div class="section-head"><div><p class="kicker">History</p><h2>Rates and inflation</h2></div>
+<div class="range" role="group" aria-label="Time range" id="range">
+<button type="button" data-y="1">1Y</button><button type="button" data-y="3">3Y</button><button type="button" data-y="5" aria-pressed="true">5Y</button><button type="button" data-y="10">10Y</button><button type="button" data-y="0">Max</button>
+</div></div>
+<div class="chart-grid">
+<div class="chart" id="cPolicy"><div class="chart-head"><h3>Policy rates</h3><div class="key" data-key></div></div><p class="src">Source: ECB (deposit facility rate); Federal Reserve via FRED (DFEDTARU). Month-end values.</p></div>
+<div class="chart" id="cInfl"><div class="chart-head"><h3>Inflation, % a year</h3><div class="key" data-key></div></div><p class="src">Source: Eurostat via ECB (HICP, ICP dataset); BLS via FRED (CPIAUCSL, 12-month change). Dashed line: 2% target.</p></div>
+<div class="chart" id="c10y"><div class="chart-head"><h3>10-year government bond yields</h3><div class="key" data-key></div></div><p class="src">Source: ECB long-term interest rate statistics (IRS, monthly average); US Treasury via FRED (DGS10, month-end).</p></div>
+<div class="chart" id="cSpread"><div class="chart-head"><h3>Spreads, basis points</h3><div class="key" data-key></div></div><p class="src">Source: calculated from the series above. Ireland&ndash;Germany uses monthly averages; US 10y&ndash;2y uses month-end yields (DGS10, DGS2).</p></div>
+<div class="chart" id="cEuribor"><div class="chart-head"><h3>Euribor and the ECB deposit rate</h3><div class="key" data-key></div></div><p class="src">Source: ECB (FM dataset). 3-month Euribor is the monthly average; it drives most Irish tracker and variable mortgage rates and bank deposit margins.</p></div>
+<div class="chart" id="cFx"><div class="chart-head"><h3>EUR/USD</h3><div class="key" data-key></div></div><p class="src">Source: ECB euro reference rate (EXR.D.USD.EUR.SP00.A). Month-end values.</p></div>
+</div>
+</section>
+
+<section class="wrap section">
+<div class="section-head"><div><p class="kicker">Today vs a year ago</p><h2>Yield curves</h2></div><p>Maturity axis is square-root scaled so the short end is readable.</p></div>
+<div class="chart-grid">
+<div class="chart" id="cEaCurve"><div class="chart-head"><h3>Euro area AAA government curve</h3><div class="key" data-key></div></div><p class="src" id="srcEa">Source: ECB yield curves (YC dataset, Svensson spot rates, AAA-rated euro area central government bonds).</p></div>
+<div class="chart" id="cUsCurve"><div class="chart-head"><h3>US Treasury curve</h3><div class="key" data-key></div></div><p class="src" id="srcUs">Source: US Treasury constant-maturity yields via FRED (DGS3MO to DGS30).</p></div>
+</div>
+</section>
+
+<section class="wrap section">
+<div class="section-head"><div><p class="kicker">Reading the dashboard</p><h2>How this feeds a valuation</h2></div></div>
+<div class="grid3">
+<div class="card"><div class="n">Risk-free rate</div><h3>WACC starts here</h3><p>The cost of equity is the risk-free rate plus beta times the equity risk premium. A 10-year AAA or Bund yield is the usual euro starting point, so a 50bp move in yields moves every DCF on this site.</p></div>
+<div class="card"><div class="n">Euribor</div><h3>Bank earnings</h3><p>Irish banks earn the gap between what loans and deposits pay. Most of that tracks Euribor and the ECB deposit rate, which is why the AIB note leans on the rate path.</p></div>
+<div class="card"><div class="n">Curve shape</div><h3>Growth signal</h3><p>When short rates sit above long rates (an inverted curve), markets expect cuts and slower growth. A steepening curve usually means the opposite.</p></div>
+</div>
+<p class="disclaimer">Student work, not investment advice. Data are published by the ECB, Eurostat, the US Treasury, the BLS and the Federal Reserve and are refreshed on weekdays by an automated job; check the original source before relying on any figure. <span id="fails"></span> See <a href="/disclosures/">Disclosures</a>.</p>
+</section>
+</main>
+
+<footer>
+<div class="wrap">
+<div class="foot-top">
+<div>
+<div class="foot-name">Hammaad Mondal</div>
+<p style="margin-top:6px">MSc Finance, UCD Michael Smurfit Graduate Business School &middot; Dublin</p>
+</div>
+<div class="foot-links">
+<a href="mailto:hammaadmondal@gmail.com">hammaadmondal@gmail.com</a>
+<a href="https://www.linkedin.com/in/hammaadmondal">LinkedIn</a>
+<a href="/resume/">Resume</a>
+<a href="/disclosures/">Disclosures</a>
+</div>
+</div>
+<div class="foot-bottom">
+<p>Student work, not investment advice. Ratings and price targets are illustrative and date-stamped. See <a href="/disclosures/">Disclosures</a>.</p>
+<p>&copy; 2026 Hammaad Mondal</p>
+</div>
+</div>
+</footer>
+
+<script src="/tools/chart.js"></script>
+<script>
+(function () {
+  var C = { green: "#1e5c4e", ink: "#15171b", blue: "#3b6ea5", amber: "#b5731c", grey: "#9a9fa7" };
+  var LOCAL = "/tools/macro/data.json";
+  var RAW = "https://raw.githubusercontent.com/hammaadmondal/hammaadmondal.github.io/main/tools/macro/data.json";
+  var $ = function (id) { return document.getElementById(id); };
+  var D, years = 5;
+
+  function grab(u) { return fetch(u + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) { if (!r.ok) throw r.status; return r.json(); }); }
+  Promise.allSettled([grab(LOCAL), grab(RAW)]).then(function (res) {
+    var ok = res.filter(function (r) { return r.status === "fulfilled" && r.value && r.value.series; }).map(function (r) { return r.value; });
+    if (!ok.length) { var s = $("status"); s.textContent = "Data is not available yet. It refreshes every weekday morning; please check back shortly."; s.classList.add("err"); return; }
+    ok.sort(function (a, b) { return b.updated.localeCompare(a.updated); });
+    D = ok[0];
+    var u = new Date(D.updated.replace("Z", ":00Z"));
+    $("status").textContent = "Data refreshed " + fmtDay(u.getTime()) + ", " + String(u.getUTCHours()).padStart(2, "0") + ":" + String(u.getUTCMinutes()).padStart(2, "0") + " UTC.";
+    if (D.errors && D.errors.length) $("fails").textContent = "At the last refresh " + D.errors.length + " series could not be updated and show their previous values.";
+    tiles(); charts(); curves();
+  });
+
+  var ts = function (d) { return Date.parse(d + "T00:00:00Z"); };
+  function S(id) { return D.series[id]; }
+  function pts(id) { var s = S(id); return s ? s.obs.map(function (o) { return [ts(o[0]), o[1]]; }) : []; }
+  function cut(p) { if (!years) return p; var lim = Date.now() - years * 365.25 * 864e5; return p.filter(function (q) { return q[0] >= lim; }); }
+  var f2 = function (v) { return v.toFixed(2) + "%"; };
+
+  function tiles() {
+    var spec = [
+      ["ecb_dfr", "ECB deposit rate", "rate"], ["fed_upper", "Fed funds (upper)", "rate"],
+      ["ea_hicp", "Euro area inflation", "pts"], ["ie_hicp", "Ireland inflation", "pts"],
+      ["euribor3m", "3-month Euribor", "rate"], ["ie_10y", "Ireland 10-year", "rate"],
+      ["us_10y", "US 10-year", "rate"], ["eurusd", "EUR/USD", "fx"]
+    ];
+    $("tiles").innerHTML = spec.map(function (t) {
+      var s = S(t[0]); if (!s) return "";
+      var v = s.latest[1], d = s.latest[0], ya = s.year_ago, chg = "";
+      if (ya) {
+        var diff = v - ya[1], cls = diff > 0 ? "up" : diff < 0 ? "dn" : "";
+        if (t[2] === "rate") chg = '<b class="' + cls + '">' + (diff >= 0 ? "+" : "−") + Math.round(Math.abs(diff) * 100) + "bp</b> on a year";
+        else if (t[2] === "pts") chg = '<b class="' + cls + '">' + (diff >= 0 ? "+" : "−") + Math.abs(diff).toFixed(1) + "pts</b> on a year (was " + ya[1].toFixed(1) + "%)";
+        else chg = '<b class="' + cls + '">' + (diff >= 0 ? "+" : "−") + Math.abs(diff / ya[1] * 100).toFixed(1) + "%</b> on a year";
+      }
+      var val = t[2] === "fx" ? v.toFixed(4) : t[2] === "pts" ? v.toFixed(1) + "%" : v.toFixed(2) + "%";
+      var when = d.length === 10 && s.unit.indexOf("y/y") < 0 && t[0] !== "ie_10y" && t[0] !== "euribor3m" ? fmtDay(ts(d)) : fmtMonth(ts(d));
+      return '<div class="tile"><span class="l">' + t[1] + '</span><div class="v">' + val + '</div><div class="d">' + chg + '</div><div class="when">' + when + "</div></div>";
+    }).join("");
+  }
+
+  function key(el, ser) {
+    el.querySelector("[data-key]").innerHTML = ser.map(function (s) { return '<span style="color:' + s.color + '"><i class="' + (s.dash ? "dash" : "") + '" style="background:' + s.color + '"></i><span style="color:var(--body)">' + s.name + "</span></span>"; }).join("");
+  }
+  function plot(id, ser, extra) {
+    var el = $(id); ser = ser.filter(function (s) { return s.points.length; });
+    ser.forEach(function (s) { s.points = cut(s.points); });
+    key(el, ser);
+    lineChart(el, Object.assign({ series: ser, xType: "time", tipX: fmtMonth, yFmt: f2, height: 260 }, extra || {}));
+  }
+  function spread(a, b) {
+    var mb = {}; pts(b).forEach(function (p) { mb[new Date(p[0]).toISOString().slice(0, 7)] = p[1]; });
+    return pts(a).map(function (p) { var k = new Date(p[0]).toISOString().slice(0, 7); return mb[k] == null ? null : [p[0], Math.round((p[1] - mb[k]) * 100)]; }).filter(Boolean);
+  }
+  function charts() {
+    plot("cPolicy", [{ name: "ECB deposit rate", color: C.green, points: pts("ecb_dfr") }, { name: "Fed funds (upper)", color: C.ink, points: pts("fed_upper") }]);
+    plot("cInfl", [{ name: "Euro area", color: C.green, points: pts("ea_hicp") }, { name: "Euro area core", color: C.blue, points: pts("ea_core") }, { name: "Ireland", color: C.amber, points: pts("ie_hicp") }, { name: "US CPI", color: C.ink, points: pts("us_cpi") }], { ref: [{ y: 2, label: "2% target" }], yFmt: function (v) { return v.toFixed(1) + "%"; } });
+    plot("c10y", [{ name: "Ireland", color: C.green, points: pts("ie_10y") }, { name: "Germany", color: C.blue, points: pts("de_10y") }, { name: "US", color: C.ink, points: pts("us_10y") }]);
+    plot("cSpread", [{ name: "Ireland less Germany 10y", color: C.green, points: spread("ie_10y", "de_10y") }, { name: "US 10y less 2y", color: C.ink, points: spread("us_10y", "us_2y") }], { yUnit: "", yFmt: function (v) { return Math.round(v) + "bp"; } });
+    plot("cEuribor", [{ name: "3-month Euribor", color: C.green, points: pts("euribor3m") }, { name: "ECB deposit rate", color: C.ink, dash: true, points: pts("ecb_dfr") }]);
+    plot("cFx", [{ name: "USD per EUR", color: C.green, points: pts("eurusd") }], { yUnit: "", yFmt: function (v) { return v.toFixed(4); } });
+  }
+
+  function curves() {
+    var lab = function (t) { return t < 1 ? Math.round(t * 12) + "M" : t + "Y"; };
+    [["ea", "cEaCurve", "srcEa"], ["us", "cUsCurve", "srcUs"]].forEach(function (c) {
+      var cv = D.curves && D.curves[c[0]], el = $(c[1]);
+      if (!cv) { el.insertAdjacentHTML("beforeend", '<p class="status">Curve not available at the last refresh.</p>'); return; }
+      var tick = cv.now.map(function (p) { return Math.sqrt(p[0]); });
+      var ser = [
+        { name: fmtDay(ts(cv.date)), color: C.green, dots: true, points: cv.now.map(function (p) { return [Math.sqrt(p[0]), p[1]]; }) },
+        { name: cv.year_ago_date ? fmtDay(ts(cv.year_ago_date)) : "A year earlier", color: C.grey, dash: true, tipColor: C.grey, points: cv.year_ago.map(function (p) { return [Math.sqrt(p[0]), p[1]]; }) }
+      ];
+      key(el, ser);
+      lineChart(el, { series: ser, xType: "num", xTicks: tick, xLabel: function (x) { return lab(+(x * x).toFixed(2)); }, tipX: function (x) { return lab(+(x * x).toFixed(2)) + " maturity"; }, yFmt: f2, height: 260 });
+    });
+  }
+
+  document.querySelectorAll("#range button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      years = +b.dataset.y;
+      document.querySelectorAll("#range button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+      if (D) charts();
+    });
+  });
+})();
+</script>
+</body>
+</html>
